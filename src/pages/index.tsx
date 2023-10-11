@@ -1,8 +1,12 @@
 import Head from "next/head";
 import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
 
+import { api } from "~/utils/api";
+
 export default function Home() {
   const user = useUser();
+
+  const { data } = api.bookmarks.getAll.useQuery();
 
   return (
     <>
@@ -12,7 +16,20 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center">
-        {user.isSignedIn ? <SignOutButton /> : <SignInButton />}
+        <section>
+          {user.isSignedIn ? <SignOutButton /> : <SignInButton />}
+        </section>
+        <section>
+          {data ? (
+            data.map((datum) => (
+              <a href={datum.url} target="_blank" key={datum.id}>
+                {datum.title}
+              </a>
+            ))
+          ) : (
+            <p>No bookmarks found. Sorry!</p>
+          )}
+        </section>
       </main>
     </>
   );
